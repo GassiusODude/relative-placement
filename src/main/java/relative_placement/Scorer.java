@@ -425,4 +425,25 @@ public class Scorer {
         }
         printState();
     }
+    /**
+     * Load in a CSV of judges rankings.  Perform relative placement.
+     * Save sorted results to an output CSV file.
+     * 
+     * @param args 3 element argument (INPUT.CSV OUTPUT.CSV TOKEN)
+     */
+    public static void main(String[] args){
+        if (args.length < 2 || args.length > 3)
+            throw new RuntimeException("Expecting 2 input arguments, input csv and output csv");
+        String token = ",";
+        if (args.length == 3)
+            token = args[2];
+
+        System.out.println("Input CSV = " + args[0]);
+        System.out.println("Output CSV = " + args[1]);
+
+        Scorer myScorer = new Scorer();
+        myScorer.loadCSV(args[0], true, token);
+        myScorer.process();
+        myScorer.writeCSV(args[1], token);
+    }
 }

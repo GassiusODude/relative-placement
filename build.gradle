@@ -10,6 +10,6 @@ dependencies {
 
 jar {
     manifest {
-        attributes "Main-Class": "jdsp.example.JdspExamples"
+        attributes "Main-Class": "relative_placement.Scorer"
     }
 }

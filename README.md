@@ -14,10 +14,27 @@ $ gradle build javadoc
 ~~~
 
 ## Run
-Currently only a library of functions.
-1. Load from a CSV file.
+To run scoring system on "input.csv" and save the results to "results.csv".  
+The expected token used is "@".
+~~~bash
+$ java -jar relative-placement.jar input.csv results.csv @
+~~~
+
+The expected input format is:
+
+| Leader | Follower | Judge 1 | Judge 2 | Judge 3 | Judge 4 | Judge 5 | Head Judge |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Lead 1 | Follower 1 | rank a | rank b | rank c | rank d | rank e | rank f
+| ... | ... | ... | ... | ... | ... | ... | ... |
+| Lead n | Follower n | rank a+n | rank b+n | rank c+n | rank d+n | rank e+n | rank f+n |
+There should e 3+ judges + 1 head judge.  Number of regular judges will be odd.
+The ranks per judge must range from 1 to n, with no duplicates.
+
+### Steps Taken
+1. Load in input.csv file.
 2. Score and rank contestants.
-3. Generate an output of the sorted results (in CSV format)
+3. Generate sorted result to "results.csv".
+
 
 ## Future Plans
 * Create a GUI
