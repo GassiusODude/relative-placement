@@ -31,6 +31,9 @@ public class Scorer {
         numContestants = 0;
         majority = 3;
     }
+    public int[] getSorted(){
+        return sortedIndex;
+    }
     public void display(){
         System.out.println("Judges");
         for (String judge : judges){
@@ -331,6 +334,11 @@ public class Scorer {
             System.out.println();
         }
     }
+    /**
+     * Write the output CSV file
+     * @param path Path for the output file
+     * @param token Token to use.
+     */
     public void writeCSV(String path, String token){
         String tmpS;
         try{
