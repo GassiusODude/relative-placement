@@ -32,15 +32,30 @@ public class Scorer {
         numContestants = 0;
         majority = 3;
     }
+    /**
+     * Get the number of contestants
+     * @return Return the number of currently loaded judges.
+     */
     public int getNumContestants(){
         return numContestants;
     }
+    /**
+     * Get the number of judges loaded in.
+     * @return The number of judges
+     */
     public int getNumJudges(){
         return numJudges;
     }
+    /**
+     * Get the sorted index list of the computed placement
+     * @return The sorting based on computed placement of input list.
+     */
     public int[] getSorted(){
         return sortedIndex;
     }
+    /**
+     * Display the current state of the Scorer
+     */
     public void display(){
         System.out.println("Judges");
         for (String judge : judges){
@@ -324,6 +339,9 @@ public class Scorer {
         }
     }
 
+    /**
+     * Print the current results.
+     */
     public void printState(){
         String tmpS;
         int tmpC;
@@ -348,6 +366,10 @@ public class Scorer {
             System.out.println();
         }
     }
+    /**
+     * Update a data model with the results
+     * @param data The data model
+     */
     public void getSortedRank(DefaultTableModel data){
         // clear old data
         data.setRowCount(0);

@@ -20,10 +20,9 @@ $ gradle build javadoc
 ~~~
 
 # Run
-To run scoring system on "input.csv" and save the results to "results.csv".  
-The expected token used is "@".
+To launch the swing GUI, run the following command.
 ~~~bash
-$ java -jar relative-placement.jar input.csv results.csv @
+$ java -jar relative-placement.jar
 ~~~
 
 ### Input CSV Format
@@ -43,9 +42,3 @@ The expected input format is:
 1. Load in input.csv file.
 2. Score and rank contestants.
 3. Generate sorted result to "results.csv".
-
-
-# Future Plans
-* Create a GUI
-  * Support file load dialog to select CSV file
-  * Support JTable view
