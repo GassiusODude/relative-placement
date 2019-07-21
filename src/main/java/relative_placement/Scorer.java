@@ -9,7 +9,8 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.lang.RuntimeException;
 import java.util.Arrays;
-
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 public class Scorer {
     private ArrayList<String> leaders = new ArrayList();
     private ArrayList<String> followers = new ArrayList();
@@ -30,6 +31,12 @@ public class Scorer {
         numJudges = 0;
         numContestants = 0;
         majority = 3;
+    }
+    public int getNumContestants(){
+        return numContestants;
+    }
+    public int getNumJudges(){
+        return numJudges;
     }
     public int[] getSorted(){
         return sortedIndex;
@@ -59,6 +66,13 @@ public class Scorer {
     public void loadCSV(String path, boolean firstRowHeader, String token){
         File f = new File(path);
         BufferedReader br = null;
+        leaders.clear();
+        followers.clear();
+        judges.clear();
+        numContestants = 0;
+        numJudges = 0;
+        ranks = new ArrayList<ArrayList>();
+
         try{
             // open file and get buffered stream
             FileInputStream fis = new FileInputStream(f);
@@ -332,6 +346,59 @@ public class Scorer {
                 System.out.printf(tmpS );
             }
             System.out.println();
+        }
+    }
+    public void getSortedRank(DefaultTableModel data){
+        // clear old data
+        data.setRowCount(0);
+        data.setColumnCount(0);
+
+        // -------------------  setup column names  -------------------------
+        int numColumns = 2 + numJudges + numContestants;
+        Vector columnNames = new Vector();
+        columnNames.add("Placement");
+        columnNames.add("Leaders");
+        columnNames.add("Followers");
+        for (String judge: judges){
+            columnNames.add(judge);
+        }
+        for (int indP = 0; indP < numContestants - 1; indP++){
+            columnNames.add(Integer.toString(indP + 1));
+        }
+
+        data.setColumnIdentifiers(columnNames);
+
+        // ---------------------  setup data  -------------------------------
+        int tmpC;
+        String tmpS;
+        Vector cData;
+        for (int indC = 0; indC < numContestants; indC++){
+            tmpC = sortedIndex[indC];
+            cData = new Vector();
+            cData.add(Integer.toString(indC + 1));
+            cData.add(leaders.get(tmpC));
+            cData.add(followers.get(tmpC));
+
+            // add judges ranks
+            for (int indJ = 0; indJ < numJudges; indJ++){
+                cData.add(Integer.toString(ranksInt[tmpC][indJ]));
+            }
+
+            // add counts
+            for (int indP = 0; indP < numContestants - 1; indP++){
+                if (count[tmpC][indP] == 0){
+                    tmpS = "";
+                }
+                else if (count[tmpC][indP] < 0){
+                    tmpS = "--";
+                }
+                else{
+                    tmpS = String.format("%3d", count[tmpC][indP]);
+                }
+                cData.add(tmpS);
+            }
+            data.addRow(cData);
+
         }
     }
     /**

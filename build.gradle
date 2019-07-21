@@ -10,6 +10,6 @@ dependencies {
 
 jar {
     manifest {
-        attributes "Main-Class": "relative_placement.Scorer"
+        attributes "Main-Class": "relative_placement.ScorerGUI"
     }
 }
