@@ -25,6 +25,12 @@ To launch the swing GUI, run the following command.
 $ java -jar relative-placement.jar
 ~~~
 
+Currently the Java Swing UI shows the results in a table.  There is no support yet for printing.  
+
+The recommended use case is to export CSV and format within a spreadsheet application.  This will give more options for formatting the output.  Check the examples folder.
+* Format colors / Fonts
+* Add rotation to headers
+
 ### Input CSV Format
 The expected input format is:
 
@@ -35,7 +41,7 @@ The expected input format is:
 | Lead n | Follower n | rank a+n | rank b+n | rank c+n | rank d+n | rank e+n | rank f+n |
 
 ### Error Checks
-* There should e 3+ regular judges + 1 head judge.  Number of regular judges should be odd.
+* There should be 3+ regular judges + 1 head judge.  Number of regular judges should be odd.
 * The ranks per judge must range from 1 to n, with no duplicates.
 
 ### Steps Taken

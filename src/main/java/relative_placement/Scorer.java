@@ -1,3 +1,9 @@
+/**
+ * Relative placement functionality
+ * 
+ * @author Gassius ODude
+ * @since July 22, 2019
+ */
 package relative_placement;
 import java.util.ArrayList;
 import java.io.File;
@@ -23,6 +29,10 @@ public class Scorer {
     private int[][] count;
     private int[][] quality;
     private int[] sortedIndex;
+
+    /**
+     * Scorer constructor
+     */
     public Scorer(){
         leaders = new ArrayList();
         followers = new ArrayList();
@@ -520,7 +530,6 @@ public class Scorer {
 
             sortedIndex[tmp1 - 1] = indC;
         }
-        printState();
     }
     /**
      * Load in a CSV of judges rankings.  Perform relative placement.

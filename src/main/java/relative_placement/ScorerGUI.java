@@ -1,3 +1,9 @@
+/**
+ * Swing user interface for calling relative placement functionality.
+ * 
+ * @author Gassius ODude
+ * @since July 22, 2019
+ */
 package relative_placement;
 import java.awt.Color;
 import java.awt.Component;
@@ -16,34 +22,52 @@ import java.io.FileInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-public class ScorerGUI extends JFrame{
-
+import javax.swing.filechooser.FileNameExtensionFilter;
+public class ScorerGUI extends JFrame implements ActionListener{
+    private String currentToken = ",";
     JMenuBar menuBar = new JMenuBar();
     JMenu menu = new JMenu("File");
     JMenuItem menuItemLoad = new JMenuItem("Load CSV");
     JMenuItem menuItemExport = new JMenuItem("Export CSV");
     JMenuItem menuItemExit = new JMenuItem("Exit");
+    JMenu options = new JMenu("Options");
+    JRadioButtonMenuItem rbmiComma = new JRadioButtonMenuItem("COMMA(,)");
+    JRadioButtonMenuItem rbmiTilda = new JRadioButtonMenuItem("TILDA(~)");
+    JRadioButtonMenuItem rbmiDollar = new JRadioButtonMenuItem("DOLLAR($)");
+    ButtonGroup tokens;
     JFileChooser jfc = new JFileChooser();
     JPanel panel = new JPanel();
     JScrollPane scrollPane;
     JTable table;
     Results results = new Results();
-    public ScorerGUI(){
+    public ScorerGUI() {
         super("Relative Placement Scorer");
         this.setSize(600, 400);
+        jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma Separated Variable", "csv"));
+        jfc.setAcceptAllFileFilterUsed(true);
 
         // ------------------------- setup menu  ----------------------------
+        tokens = new ButtonGroup();
+        tokens.add(rbmiComma);
+        tokens.add(rbmiTilda);
+        tokens.add(rbmiDollar);
+        rbmiComma.setSelected(true);
+        rbmiComma.addActionListener(this);
+        rbmiTilda.addActionListener(this);
+        rbmiDollar.addActionListener(this);
         menu.add(menuItemLoad);
+
         menuItemLoad.addActionListener(new ActionListener(){
 
             public void actionPerformed(ActionEvent event){
                 try{
                     int retVal = jfc.showOpenDialog(null);
+        
                     if (retVal == 0){
                         File f = jfc.getSelectedFile();
                         
                         // assumes first row is header and token is comma
-                        results.load(f.toString());
+                        results.load(f.toString(), currentToken);
 
                         menuItemExport.setEnabled(true);
                     }
@@ -63,7 +87,7 @@ public class ScorerGUI extends JFrame{
                     File f = jfc.getSelectedFile();
                     
                     // assumes first row is header and token is comma
-                    results.export(f.toString());
+                    results.export(f.toString(), currentToken);
                 }
             }
         });
@@ -74,6 +98,11 @@ public class ScorerGUI extends JFrame{
             }
         });
         menuBar.add(menu);
+
+        options.add(rbmiComma);
+        options.add(rbmiTilda);
+        options.add(rbmiDollar);
+        menuBar.add(options);
 
         // ------------------------  setup panel  ---------------------------
         table = new JTable(results);
@@ -143,6 +172,22 @@ public class ScorerGUI extends JFrame{
               System.exit(0);
             }
         });
+    }
+    public void actionPerformed(ActionEvent e) {
+        switch (e.getActionCommand()){
+            case "COMMA(,)":
+                currentToken = ",";
+                break;
+            case "TILDA(~)":
+                currentToken = "~";
+                break;
+            case "DOLLAR($)":
+                currentToken = "$";
+                break;
+            default:
+                break;
+        }
+        
     }
 
     public static void main(String[] args) 

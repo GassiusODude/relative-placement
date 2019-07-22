@@ -1,3 +1,9 @@
+/**
+ * Results for Relative Placement.
+ * 
+ * @author Gassius ODude
+ * @since July 22, 2019
+ */
 package relative_placement;
 import javax.swing.table.DefaultTableModel;
 import relative_placement.Scorer;
@@ -7,6 +13,9 @@ public class Results extends DefaultTableModel {
     private int numCols = 0;
     private Scorer scorer;
 
+    /**
+     * Constructor of the Results
+     */
     public Results(){
         scorer = new Scorer();
     }
@@ -32,10 +41,19 @@ public class Results extends DefaultTableModel {
     }
 
     /**
-     * Export the computed results
+     * Export the computed results, using default comma token
      * @param path Path of the output file.
      */
     public void export(String path){
-        scorer.writeCSV(path, ",");
+       export(path, ",");
+    }
+
+    /**
+     * Export the computed results
+     * @param path Path of the output file.
+     * @param token Token used to separate entries.
+     */
+    public void export(String path, String token){
+        scorer.writeCSV(path, token);
     }
 }
