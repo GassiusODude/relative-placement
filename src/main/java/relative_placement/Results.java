@@ -1,23 +1,22 @@
 /**
  * Results for Relative Placement.
- * 
+ *
  * @author Gassius ODude
  * @since July 22, 2019
  */
 package relative_placement;
 import javax.swing.table.DefaultTableModel;
 import relative_placement.Scorer;
+import relative_placement.ScorerRelPlacement;
 
 public class Results extends DefaultTableModel {
-    private int numRows = 0;
-    private int numCols = 0;
     private Scorer scorer;
 
     /**
      * Constructor of the Results
      */
     public Results(){
-        scorer = new Scorer();
+        scorer = new ScorerRelPlacement();
     }
 
     /**
@@ -35,7 +34,7 @@ public class Results extends DefaultTableModel {
      */
     public void load(String path, String token){
         scorer.loadCSV(path, true, token);
-        scorer.process();
+        scorer.rankContestants();
 
         scorer.getSortedRank(this);
     }
