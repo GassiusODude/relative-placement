@@ -11,8 +11,8 @@ public class ScorerRelPlacement extends Scorer {
     public void rankContestants() {
         // ----------------  calculate count and quality  -------------------
         // initiate count and quality
-        count = new int[numContestants][numContestants];
-        quality =  new int[numContestants][numContestants];
+        count = new int[numContestants][numContestants+1];
+        quality =  new int[numContestants][numContestants+1];
 
         // prepare variables
         int val;
@@ -25,7 +25,7 @@ public class ScorerRelPlacement extends Scorer {
             // update majority count and quality matrices
             for (int indJudge = 0; indJudge < numJudges - 1; indJudge++) {
                 val = contestantRanks.get(indJudge);
-                for (int indPlacement = val; indPlacement < numContestants; indPlacement++) {
+                for (int indPlacement = val; indPlacement < count[0].length; indPlacement++) {
                     // track the count of ranks under a placment
                     count[indContestant][indPlacement - 1] ++;
 
@@ -34,7 +34,7 @@ public class ScorerRelPlacement extends Scorer {
                 }
             }
         }
-        logger.info("Finished initializing count and quality");
+
         // ----------------  rankContestants based on meeting majority  -------------
         processMajority();
 
@@ -43,7 +43,7 @@ public class ScorerRelPlacement extends Scorer {
         logger.finest("sortedIndex length = " + sortedIndex.length);
         for (int indContestant = 0; indContestant < numContestants; indContestant++) {
             try {
-                tmp1 = count[indContestant][numContestants - 1];
+                tmp1 = count[indContestant][count[0].length - 1];
                 logger.finest("tmp1 = " + tmp1);
                 sortedIndex[tmp1 - 1] = indContestant;
             }
@@ -66,7 +66,7 @@ public class ScorerRelPlacement extends Scorer {
         int[] tieBreaks;
         ArrayList<Integer> activeList;
 
-        for (int indP = 0; indP < numContestants - 1; indP++) {
+        for (int indP = 0; indP < count[0].length - 1; indP++) {
 
             // ---------------- track contestant with majority  -------------
             // identify contestants meeting majority at curent placement
@@ -79,13 +79,13 @@ public class ScorerRelPlacement extends Scorer {
 
             if (activeList.size() == 1) {
                 // --------------------  single placement  ------------------
-                for (int indC = indP + 1; indC < numContestants; indC++)
+                for (int indC = indP + 1; indC < count[0].length; indC++)
                     // set counts past this to -1 so it is not looked at
                     // for the next iteration
                     count[activeList.get(0)][indC] = -1;
 
                 // last column is the ranking
-                count[activeList.get(0)][numContestants - 1] = lastAssignedPlace++;
+                count[activeList.get(0)][count[0].length - 1] = lastAssignedPlace++;
 
             }
             else if (activeList.size() > 1) {
@@ -98,11 +98,11 @@ public class ScorerRelPlacement extends Scorer {
 
                     // change counts to -1 so already ranked contestants
                     // are no long considered for next round
-                    for (int indC = indP + 1; indC < numContestants; indC++)
+                    for (int indC = indP + 1; indC < count[0].length; indC++)
                         count[cWinner][indC] = -1;
 
                     // update last column with the placement
-                    count[cWinner][numContestants - 1] = lastAssignedPlace++;
+                    count[cWinner][count[0].length - 1] = lastAssignedPlace++;
                 }
             }
         }
@@ -311,12 +311,13 @@ public class ScorerRelPlacement extends Scorer {
         try {
             File f = new File(path);
             BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+
             // ------------------  write header  ----------------------------
             writer.write("Leader" + token + "Follower" + token);
             for (String judge : judges)
                 writer.write(judge + token);
 
-            for (int indC = 0; indC < numContestants - 1; indC++) {
+            for (int indC = 0; indC < count[0].length - 1; indC++) {
                 if (indC == 0)
                     writer.write("1st" + token);
                 else if (indC == 1)
@@ -343,7 +344,7 @@ public class ScorerRelPlacement extends Scorer {
                     writer.write(ranksInt[tmpC][indJ] + token);
 
                 // write counts
-                for (int indC2 = 0; indC2 < numContestants; indC2++) {
+                for (int indC2 = 0; indC2 < count[0].length; indC2++) {
                     if (count[tmpC][indC2] == 0) {
                         tmpS = "    ";
                     }
@@ -383,7 +384,7 @@ public class ScorerRelPlacement extends Scorer {
         for (String judge: judges){
             columnNames.add(judge);
         }
-        for (int indP = 0; indP < numContestants - 1; indP++){
+        for (int indP = 0; indP < count[0].length - 1; indP++){
             columnNames.add(Integer.toString(indP + 1));
         }
 
@@ -406,7 +407,7 @@ public class ScorerRelPlacement extends Scorer {
             }
 
             // add counts
-            for (int indP = 0; indP < numContestants - 1; indP++) {
+            for (int indP = 0; indP < count[0].length; indP++) {
                 if (count[tmpC][indP] == 0) {
                     tmpS = "";
                 }

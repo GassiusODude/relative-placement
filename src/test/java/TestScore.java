@@ -81,4 +81,20 @@ public class TestScore{
             assertEquals("Match", ind0+1, expected[results[ind0]]);
         }
     }
+    @Test
+    public void testScore_even(){
+        Scorer scorer = new ScorerRelPlacement();
+        scorer.setLogLevel(Level.FINE);
+        String s = getClass().getResource("rel_placement_even.csv").getFile();
+        System.out.println("s = " + s);
+        scorer.loadCSV(s, true, ",");
+        scorer.rankContestants();
+        int[] results = scorer.getSorted();
+        int[] expected = {4, 9, 7, 5, 3, 12,10,2,8,6,11,1};
+
+        //assertArrayEquals("Check 1", expected, results);
+        for (int ind0 = 0; ind0 < results.length; ind0++){
+            assertEquals(expected[ind0], results[ind0] + 1);
+        }
+    }
 }
