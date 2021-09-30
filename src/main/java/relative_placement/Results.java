@@ -50,13 +50,11 @@ public class Results extends DefaultTableModel {
      */
     public void load(String path, String token){
         scorer.loadCSV(path, true, token);
-        System.out.println("Finished loading CSV");
 
         scorer.rankContestants();
-        System.out.println("Finished sorting ranks");
+
 
         scorer.getSortedRank(this);
-        System.out.println("Got sorted rank");
     }
 
     /**

@@ -7,10 +7,11 @@ import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 public class ScorerAvgRaw extends Scorer {
     private double[] avgScores;
+
     /**
      * Calculate on the rawScoreFloat that is populated through
      * Scorer.loadCSVRaw
-     * @return
+     * @return The sorted list in descending order
      */
     public double[] getAverageScores() {
         double[] averageScores = new double[numContestants];
@@ -22,7 +23,7 @@ public class ScorerAvgRaw extends Scorer {
                 averageScores[indC] += rawScoreFloat[indC][indJ] / (numJudges - 1);
             }
         }
-        logger.info("Finished calculating average scores");
+
         return averageScores;
     }
 
@@ -31,7 +32,7 @@ public class ScorerAvgRaw extends Scorer {
         // sort list and give rankings
         avgScores = getAverageScores();
 
-        logger.info("Update sortedIndex");
+        logger.finer("Update sortedIndex with this list sorted with high avg score being preferred");
         sortedIndex = Scorer.argSort(avgScores);
     }
 
@@ -89,7 +90,7 @@ public class ScorerAvgRaw extends Scorer {
      * @param data The data model
      */
     public void getSortedRank(DefaultTableModel data) {
-        logger.info("Entering getSortedRank");
+        logger.finer("Entering getSortedRank");
         // clear old data
         data.setRowCount(0);
         data.setColumnCount(0);
@@ -105,13 +106,13 @@ public class ScorerAvgRaw extends Scorer {
         columnNames.add("Average Raw");
 
         data.setColumnIdentifiers(columnNames);
-        logger.info("Column headers updated");
+        logger.finer("Column headers updated");
 
         // ---------------------  setup data  -------------------------------
         int tmpC;
         Vector cData;
         for (int indC = 0; indC < numContestants; indC++) {
-            logger.info("Writing data row " + indC);
+            logger.finer("Writing data row " + indC);
             cData = new Vector();
 
             // update placement

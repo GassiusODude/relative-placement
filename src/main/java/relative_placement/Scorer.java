@@ -47,12 +47,35 @@ public abstract class Scorer {
     /** Number to constitute majority of judges */
     protected int majority = 3;
 
+    /**
+     * Typically the number of contestants but potentially a fixed number
+     * less than number contestants.
+     */
     protected int maxRank = 0;
 
+
+    /**
+     * The count of ranks passing a given placement.  This is set up
+     * as [numContestants x numContestants + 1]
+     */
     protected int[][] count;
+
+    /**
+     * The quality of the ranks.  This sums the ranks as a means for
+     * breaking ties.
+     */
     protected int[][] quality;
+
+    /**
+     * The sorted index of placements
+     */
     protected int[] sortedIndex;
+
+    /**
+     * The logger object for the Scorer
+     */
     protected Logger logger;
+
     /**
      * Scorer constructor
      */
@@ -64,13 +87,18 @@ public abstract class Scorer {
 
         reset();
     }
-    /** Set the log level of the logger */
+
+    /**
+     * Set the log level of the logger
+     * @param newLevel The log level to use.
+     */
     public void setLogLevel(Level newLevel) {
         logger.setLevel(newLevel);
     }
 
     /** Reset the internal variables */
     public void reset() {
+        logger.info("Resetting the Scorer");
         leaders = new ArrayList();
         followers = new ArrayList();
         judges = new ArrayList();
@@ -298,10 +326,11 @@ public abstract class Scorer {
             catch(IOException ioe) {}
         }
     }
+
     /**
-     * Validate the input
+     * Validate the input ordinals
      *
-     * Verify unique ranking per judge (but allow a max < numContestants)
+     * Verify unique ranking per judge (but allow a max less than numContestants)
      */
     protected void validateOrdinals() {
         // verify that each judge ranks is unique 1 .. numContestants

@@ -5,12 +5,14 @@ import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
+
 public class ScorerAvgOrdinals extends Scorer {
     private double[] avgOrd;
+
     /**
      * Calculate on the rawScoreFloat that is populated through
      * Scorer.loadCSVRaw
-     * @return
+     * @return The sorted list in descending order
      */
     public double[] getAverageScores() {
         double[] averageScores = new double[numContestants];
@@ -22,7 +24,7 @@ public class ScorerAvgOrdinals extends Scorer {
                 averageScores[indC] += ranksInt[indC][indJ] * 1.0 / (numJudges - 1);
             }
         }
-        logger.info("Finished calculating average scores");
+        logger.finer("Finished calculating average scores");
         return averageScores;
     }
 
@@ -31,7 +33,7 @@ public class ScorerAvgOrdinals extends Scorer {
         // sort list and give rankings
         avgOrd = getAverageScores();
 
-        logger.info("Update sortedIndex");
+        logger.finer("Flip sortedIndex, lower ordinal is better");
 
         int[] tmp = Scorer.argSort(avgOrd);
         sortedIndex = new int[tmp.length];
@@ -94,7 +96,7 @@ public class ScorerAvgOrdinals extends Scorer {
      * @param data The data model
      */
     public void getSortedRank(DefaultTableModel data) {
-        logger.info("Entering getSortedRank");
+        logger.finer("Entering getSortedRank");
         // clear old data
         data.setRowCount(0);
         data.setColumnCount(0);
@@ -110,13 +112,13 @@ public class ScorerAvgOrdinals extends Scorer {
         columnNames.add("Average Ordinal");
 
         data.setColumnIdentifiers(columnNames);
-        logger.info("Column headers updated");
+        logger.finer("Column headers updated");
 
         // ---------------------  setup data  -------------------------------
         int tmpC;
         Vector cData;
         for (int indC = 0; indC < numContestants; indC++) {
-            logger.info("Writing data row " + indC);
+            logger.finer("Writing data row " + indC);
             cData = new Vector();
 
             // update placement

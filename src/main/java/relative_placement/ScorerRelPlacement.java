@@ -8,6 +8,14 @@ import javax.swing.table.DefaultTableModel;
 
 public class ScorerRelPlacement extends Scorer {
     @Override
+    /**
+     * Rank constestants by relative placement scoring.  This is called
+     * after loadCSV.  With Relative Placement, the input should be
+     * ordinals (integer rankings) of each contestant by the judges.
+     *
+     * Ordinals are typically in the range of [1, numContestants].
+     * However, it can also be maxRank, less than numContestants.
+     */
     public void rankContestants() {
         // ----------------  calculate count and quality  -------------------
         // initiate count and quality
@@ -48,17 +56,20 @@ public class ScorerRelPlacement extends Scorer {
                 sortedIndex[tmp1 - 1] = indContestant;
             }
             catch (Exception e) {
-                logger.info("count length = " + count.length);
-                logger.info("sortedIndex length = " + sortedIndex.length);
                 logger.severe("Exception caught = " + e);
             }
         }
-        logger.info("Finished sorting");
+        logger.finer("Finished sorting");
     }
 
 
     /**
-     * process on contestants that meet the majority
+     * Begin processing the rankings, starting at a low placement and
+     * gradually increasing.  At each placement, identify contestants
+     * that have a majority of ranks less than or equal to the placement.
+     *
+     * If multiple contestants meet this criteria at a given placement
+     * level, proceed to run through the tie breaker.
      */
     protected void processMajority() {
         // initialize variables
@@ -198,7 +209,6 @@ public class ScorerRelPlacement extends Scorer {
                 return out;
 
             if (tmp.length > 0) {
-
                 // remove subset that passed
                 for (int elem : tmp) {
                     for (int ind0 = 0; ind0 < select.size(); ind0++) {
@@ -222,26 +232,15 @@ public class ScorerRelPlacement extends Scorer {
                 tmp = processTieBreaks(select, place);
             }
             else {
-                /*
-                if (place == numContestants - 1) {
-                    // last round... still tied.
-                    for (int ind0 = 0; ind0 < select.size(); ind0++) {
-                        out[completedOut] = select.get(ind0);
-                        completedOut++;
-                    }
-                    return out;
-                }
-                else {
-                    logger.fine("no elements removed...move to next placement for tiebreaker");
-                    tmp = processTieBreaks(select, place+1);
-                }
-                */
+                logger.finer("A batch of contestants are tied, returning all of them");
+                logger.warning("The placement is still monotonically increasing...they should all be set the same to denote a tie");
                 for (int ind0 = 0; ind0 < select.size(); ind0++) {
                     out[completedOut] = select.get(ind0);
                     completedOut++;
                 }
                 return out;
             }
+
             for (int ind0 = 0; ind0 < tmp.length; ind0++) {
                 out[completedOut] = tmp[ind0];
                 completedOut ++;
@@ -276,6 +275,12 @@ public class ScorerRelPlacement extends Scorer {
         return tmp1;
     }
 
+    /**
+     * Apply tie break based on quality, a sum of the ranks meeting the placement
+     * @param select The subset of contestants being considered
+     * @param place The current placements under consideration
+     * @return The chosen best or a subset that is still tied.
+     */
     protected ArrayList<Integer> tieBreakQuality(ArrayList<Integer> select, int place) {
         ArrayList<Integer> tmp2 = new ArrayList();
         int bestQuality = 32756;//numJudges * numJudges;
@@ -296,6 +301,11 @@ public class ScorerRelPlacement extends Scorer {
     }
 
     @Override
+    /**
+     * Load CSV
+     *
+     * The Relative placement scorer uses loadCSVOrdinal.
+     */
     public void loadCSV(String path, boolean firstRowHeader, String token) {
         loadCSVOrdinal(path, firstRowHeader, token);
     }
