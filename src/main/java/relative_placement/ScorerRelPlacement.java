@@ -1,5 +1,10 @@
 package relative_placement;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 
 public class ScorerRelPlacement extends Scorer {
     @Override
@@ -29,7 +34,7 @@ public class ScorerRelPlacement extends Scorer {
                 }
             }
         }
-
+        logger.info("Finished initializing count and quality");
         // ----------------  rankContestants based on meeting majority  -------------
         processMajority();
 
@@ -48,6 +53,7 @@ public class ScorerRelPlacement extends Scorer {
                 logger.severe("Exception caught = " + e);
             }
         }
+        logger.info("Finished sorting");
     }
 
 
@@ -84,7 +90,7 @@ public class ScorerRelPlacement extends Scorer {
             }
             else if (activeList.size() > 1) {
                 // multiple passing, run tie break
-                tieBreaks = rankContestantsTieBreak(activeList, indP);
+                tieBreaks = processTieBreaks(activeList, indP);
 
                 int cWinner;
                 for (int ind0 = 0; ind0 < tieBreaks.length; ind0++) {
@@ -102,12 +108,17 @@ public class ScorerRelPlacement extends Scorer {
         }
     }
 
-    protected int[] rankContestantsTieBreak(ArrayList<Integer> select, int place) {
+    /**
+     * Process tie breaks
+     * @param select A list of contestants under consideration
+     * @param place The placement level
+     * @return The sorted list...breaking the tie
+     */
+    protected int[] processTieBreaks(ArrayList<Integer> select, int place) {
         int[] out = new int[select.size()];
         int completedOut = 0;
         int[] tmp;
         ArrayList<Integer> tmp1 = new ArrayList();
-
         ArrayList<Integer> tmp2 = new ArrayList();
 
         if (out.length == 1) {
@@ -167,8 +178,6 @@ public class ScorerRelPlacement extends Scorer {
                     tmp[0] = tmp2.get(0);
                 }
                 else {
-                    logger.info("maxRank = " + maxRank);
-                    logger.info("place = " + place);
                     if (place >= maxRank) {
                         tmp = new int[tmp2.size()];
                         for (int ind=0; ind<tmp2.size(); ind++) {
@@ -203,14 +212,14 @@ public class ScorerRelPlacement extends Scorer {
 
                 // ----------------  rankContestants remaining  -----------------------
                 if (select.size() == 0) {
-                    logger.finer("Select list cleared...exiting rankContestantsTieBreak");
+                    logger.finer("Select list cleared...exiting processTieBreaks");
                     // Done!!
                     return out;
                 }
 
                 // continue procressing remaining list
                 logger.finer("Continue processing on " + select.size() + " elements");
-                tmp = rankContestantsTieBreak(select, place);
+                tmp = processTieBreaks(select, place);
             }
             else {
                 /*
@@ -224,7 +233,7 @@ public class ScorerRelPlacement extends Scorer {
                 }
                 else {
                     logger.fine("no elements removed...move to next placement for tiebreaker");
-                    tmp = rankContestantsTieBreak(select, place+1);
+                    tmp = processTieBreaks(select, place+1);
                 }
                 */
                 for (int ind0 = 0; ind0 < select.size(); ind0++) {
@@ -284,6 +293,133 @@ public class ScorerRelPlacement extends Scorer {
         }
         logger.finer(tmp2.size() + " of " + select.size() + " in tieBreakQuality (" + place + ")");
         return tmp2;
+    }
+
+    @Override
+    public void loadCSV(String path, boolean firstRowHeader, String token) {
+        loadCSVOrdinal(path, firstRowHeader, token);
+    }
+
+    @Override
+    /**
+     * Write the output CSV file for Relative placement
+     * @param path Path for the output file
+     * @param token Token to use.
+     */
+    public void writeCSV(String path, String token) {
+        String tmpS;
+        try {
+            File f = new File(path);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+            // ------------------  write header  ----------------------------
+            writer.write("Leader" + token + "Follower" + token);
+            for (String judge : judges)
+                writer.write(judge + token);
+
+            for (int indC = 0; indC < numContestants - 1; indC++) {
+                if (indC == 0)
+                    writer.write("1st" + token);
+                else if (indC == 1)
+                    writer.write("1st - 2nd" + token);
+                else if (indC == 2)
+                    writer.write("1st - 3rd" + token);
+                else
+                    writer.write("1st - " + (indC + 1) + "th" + token);
+
+            }
+            writer.write("Placement");
+
+            // -------------------  write each row  ------------------------
+            int tmpC;
+            for (int indC = 0; indC < numContestants; indC++) {
+                tmpC = sortedIndex[indC];
+                writer.write("\n");
+
+                writer.write(leaders.get(tmpC) + token +
+                    followers.get(tmpC) + token);
+
+                // write ranks
+                for (int indJ = 0; indJ < numJudges; indJ++)
+                    writer.write(ranksInt[tmpC][indJ] + token);
+
+                // write counts
+                for (int indC2 = 0; indC2 < numContestants; indC2++) {
+                    if (count[tmpC][indC2] == 0) {
+                        tmpS = "    ";
+                    }
+                    else if (count[tmpC][indC2] < 0) {
+                        tmpS = " -- ";
+                    }
+                    else{
+                        tmpS = String.format("%3d ", count[tmpC][indC2]);
+                    }
+                    writer.write(tmpS + token);
+                }
+            }
+            writer.close();
+
+        }
+        catch(java.io.FileNotFoundException fnfe){System.out.println("File not found.");}
+        catch(java.io.IOException ioe){System.out.println("IO Exception");}
+    }
+
+    @Override
+    /**
+     * Update a data model with the results
+     *
+     * The column names are Placement, Leader, Follower, Judges, Count
+     * @param data The data model
+     */
+    public void getSortedRank(DefaultTableModel data) {
+        // clear old data
+        data.setRowCount(0);
+        data.setColumnCount(0);
+
+        // -------------------  setup column names  -------------------------
+        Vector columnNames = new Vector();
+        columnNames.add("Placement");
+        columnNames.add("Leaders");
+        columnNames.add("Followers");
+        for (String judge: judges){
+            columnNames.add(judge);
+        }
+        for (int indP = 0; indP < numContestants - 1; indP++){
+            columnNames.add(Integer.toString(indP + 1));
+        }
+
+        data.setColumnIdentifiers(columnNames);
+
+        // ---------------------  setup data  -------------------------------
+        int tmpC;
+        String tmpS;
+        Vector cData;
+        for (int indC = 0; indC < numContestants; indC++) {
+            tmpC = sortedIndex[indC];
+            cData = new Vector();
+            cData.add(Integer.toString(indC + 1));
+            cData.add(leaders.get(tmpC));
+            cData.add(followers.get(tmpC));
+
+            // add judges ranks
+            for (int indJ = 0; indJ < numJudges; indJ++) {
+                cData.add(Integer.toString(ranksInt[tmpC][indJ]));
+            }
+
+            // add counts
+            for (int indP = 0; indP < numContestants - 1; indP++) {
+                if (count[tmpC][indP] == 0) {
+                    tmpS = "";
+                }
+                else if (count[tmpC][indP] < 0) {
+                    tmpS = "--";
+                }
+                else{
+                    tmpS = String.format("%3d", count[tmpC][indP]);
+                }
+                cData.add(tmpS);
+            }
+            data.addRow(cData);
+        }
     }
 
     /**

@@ -1,6 +1,6 @@
 /**
  * Swing user interface for calling relative placement functionality.
- * 
+ *
  * @author Gassius ODude
  * @since July 22, 2019
  */
@@ -23,23 +23,33 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 public class ScorerGUI extends JFrame implements ActionListener{
     private String currentToken = ",";
+    private String currentScorer = "Relative Placement";
+
     JMenuBar menuBar = new JMenuBar();
     JMenu menu = new JMenu("File");
     JMenuItem menuItemLoad = new JMenuItem("Load CSV");
     JMenuItem menuItemExport = new JMenuItem("Export CSV");
     JMenuItem menuItemExit = new JMenuItem("Exit");
     JMenu options = new JMenu("Options");
+
     JRadioButtonMenuItem rbmiComma = new JRadioButtonMenuItem("COMMA(,)");
     JRadioButtonMenuItem rbmiTilda = new JRadioButtonMenuItem("TILDA(~)");
     JRadioButtonMenuItem rbmiDollar = new JRadioButtonMenuItem("DOLLAR($)");
     ButtonGroup tokens;
+
+    JRadioButtonMenuItem rbmiRelPlace = new JRadioButtonMenuItem("Relative Placement");
+    JRadioButtonMenuItem rbmiAvgRaw = new JRadioButtonMenuItem("Average Raw Score");
+    ButtonGroup scoreType;
+
     JFileChooser jfc = new JFileChooser();
     JPanel panel = new JPanel();
     JScrollPane scrollPane;
     JTable table;
     Results results = new Results();
+
     public ScorerGUI() {
         super("Relative Placement Scorer");
         this.setSize(600, 400);
@@ -47,6 +57,7 @@ public class ScorerGUI extends JFrame implements ActionListener{
         jfc.setAcceptAllFileFilterUsed(true);
 
         // ------------------------- setup menu  ----------------------------
+        // setup token radio button group
         tokens = new ButtonGroup();
         tokens.add(rbmiComma);
         tokens.add(rbmiTilda);
@@ -55,17 +66,38 @@ public class ScorerGUI extends JFrame implements ActionListener{
         rbmiComma.addActionListener(this);
         rbmiTilda.addActionListener(this);
         rbmiDollar.addActionListener(this);
+
+        // setup scorer type radio button group
+        scoreType = new ButtonGroup();
+        scoreType.add(rbmiRelPlace);
+        scoreType.add(rbmiAvgRaw);
+        rbmiRelPlace.setSelected(true);
+        rbmiRelPlace.addActionListener(this);
+        rbmiAvgRaw.addActionListener(this);
+
         menu.add(menuItemLoad);
 
         menuItemLoad.addActionListener(new ActionListener(){
 
             public void actionPerformed(ActionEvent event){
-                try{
+                try {
+
+                    switch (currentScorer) {
+                        case "Average Raw Score":
+                            System.out.println("Using average raw score");
+                            results.setScorer(new ScorerAvgRaw());
+                            break;
+                        case "Relative Placement":
+                        default:
+                            System.out.println("Using relative placement");
+                            results.setScorer(new ScorerRelPlacement());
+                    }
+
                     int retVal = jfc.showOpenDialog(null);
-        
+
                     if (retVal == 0){
                         File f = jfc.getSelectedFile();
-                        
+
                         // assumes first row is header and token is comma
                         results.load(f.toString(), currentToken);
 
@@ -85,7 +117,7 @@ public class ScorerGUI extends JFrame implements ActionListener{
                 int retVal = jfc.showSaveDialog(null);
                 if (retVal == 0){
                     File f = jfc.getSelectedFile();
-                    
+
                     // assumes first row is header and token is comma
                     results.export(f.toString(), currentToken);
                 }
@@ -99,9 +131,13 @@ public class ScorerGUI extends JFrame implements ActionListener{
         });
         menuBar.add(menu);
 
+        options.add(rbmiRelPlace);
+        options.add(rbmiAvgRaw);
+        options.addSeparator();
         options.add(rbmiComma);
         options.add(rbmiTilda);
         options.add(rbmiDollar);
+
         menuBar.add(options);
 
         // ------------------------  setup panel  ---------------------------
@@ -111,15 +147,18 @@ public class ScorerGUI extends JFrame implements ActionListener{
         table.setDefaultRenderer(Object.class, new TableCellRenderer(){
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column){
-                
+
                 JTextField editor = new JTextField();
                 editor.setPreferredSize(new Dimension(20, 50));
-                editor.setHorizontalAlignment(editor.CENTER);
+                editor.setHorizontalAlignment(SwingConstants.CENTER);
                 if (value != null)
                     editor.setText(value.toString());
                 int numContestants = table.getRowCount();
                 int numCols = table.getColumnCount();
-                int numJudges = numCols - numContestants - 2;
+                int numJudges = 0;
+                if (results.getNumJudges() > 0)
+                    numJudges = results.getNumJudges();
+
                 editor.setForeground(Color.white);
                 if (isSelected){
                     editor.setBackground(Color.yellow);
@@ -154,13 +193,11 @@ public class ScorerGUI extends JFrame implements ActionListener{
                         editor.setBackground(Color.DARK_GRAY);
                     else
                         editor.setBackground(new Color(0, 100, 0));
-
-
                 }
                 return editor;
             }
         });
-        
+
         scrollPane = new JScrollPane(table);
 
         // ------------------------  setup JFrame  --------------------------
@@ -184,20 +221,26 @@ public class ScorerGUI extends JFrame implements ActionListener{
             case "DOLLAR($)":
                 currentToken = "$";
                 break;
+            case "Relative Placement":
+                currentScorer = "Relative Placement";
+                break;
+            case "Average Raw Score":
+                currentScorer = "Average Raw Score";
+                break;
             default:
                 break;
         }
-        
+
     }
 
-    public static void main(String[] args) 
-    { 
+    public static void main(String[] args)
+    {
 
         javax.swing.SwingUtilities.invokeLater(new Runnable(){
             public void run(){
                 ScorerGUI scoreGUI = new ScorerGUI();
-                scoreGUI.show();
+                scoreGUI.setVisible(true);
             }
         });
-    } 
+    }
 }

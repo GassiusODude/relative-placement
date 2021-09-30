@@ -20,6 +20,22 @@ public class Results extends DefaultTableModel {
     }
 
     /**
+     * Constructor of the Results
+     * @param newScorer The scorer
+     */
+    public Results(Scorer newScorer){
+        scorer = newScorer;
+    }
+
+    public void setScorer(Scorer newScorer) {
+        scorer = newScorer;
+    }
+
+    public int getNumJudges() {
+        return scorer.getNumJudges();
+    }
+
+    /**
      * Load CSV file, use default comma (",") token
      * @param path Path to the CSV file
      */
@@ -34,9 +50,13 @@ public class Results extends DefaultTableModel {
      */
     public void load(String path, String token){
         scorer.loadCSV(path, true, token);
+        System.out.println("Finished loading CSV");
+
         scorer.rankContestants();
+        System.out.println("Finished sorting ranks");
 
         scorer.getSortedRank(this);
+        System.out.println("Got sorted rank");
     }
 
     /**

@@ -22,7 +22,6 @@ public class TestScore{
         int[] results = scorer.getSorted();
         int[] expected = {11, 8, 5, 1, 6, 10, 3, 9, 2, 7, 12, 4};
 
-
         //assertArrayEquals("Check 1", expected, results);
         for (int ind0 = 0; ind0 < results.length; ind0++){
             assertEquals("Match", ind0+1, expected[results[ind0]]);

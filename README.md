@@ -9,7 +9,7 @@ votes starting by counting only 1st places and progressively increasing to 2nd .
 
 If multiple contestants reach the same majority, a quality metric is used as tie-breaker. If the tie persist, continue testing the tied pair at the next placement level.
 
-[Rules](https://www.worldsdc.com/wp-content/uploads/2016/04/Relative_placement.pdf)
+[Rules](https://www.worldsdc.com/wp-content/uploads/2021/04/Relative-Placement-12-20-20-Rev-5-1-10-1.pdf)
 
 [Example](https://www.worldsdc.com/wp-content/uploads/2016/04/Scoring_By_Hand_EXAMPLE_9-28-04.pdf)
 
@@ -49,7 +49,7 @@ The expected input format is:
 ### Error Checks
 
 * There should be 3+ regular judges + 1 head judge.
-* The ranks per judge must range from 1 to 'n', where 'n' can be less than number contestant.  For example 20 contestants, but judges rank 1 to 15, with multiple 15.
+* The ranks per judge must range from 1 to 'n', where 'n' can be less than number contestant.  For example 20 contestants, but judges rank 1 to 15, with multiple 15 ranks.
 
 ### Steps Taken
 
