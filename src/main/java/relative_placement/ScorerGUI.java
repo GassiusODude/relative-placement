@@ -42,6 +42,7 @@ public class ScorerGUI extends JFrame implements ActionListener{
 
     JRadioButtonMenuItem rbmiRelPlace = new JRadioButtonMenuItem("Relative Placement");
     JRadioButtonMenuItem rbmiAvgRaw = new JRadioButtonMenuItem("Average Raw Score");
+    JRadioButtonMenuItem rbmiAvgOrd = new JRadioButtonMenuItem("Average Ordinal");
     ButtonGroup scoreType;
 
     JFileChooser jfc = new JFileChooser();
@@ -71,9 +72,11 @@ public class ScorerGUI extends JFrame implements ActionListener{
         scoreType = new ButtonGroup();
         scoreType.add(rbmiRelPlace);
         scoreType.add(rbmiAvgRaw);
+        scoreType.add(rbmiAvgOrd);
         rbmiRelPlace.setSelected(true);
         rbmiRelPlace.addActionListener(this);
         rbmiAvgRaw.addActionListener(this);
+        rbmiAvgOrd.addActionListener(this);
 
         menu.add(menuItemLoad);
 
@@ -86,6 +89,9 @@ public class ScorerGUI extends JFrame implements ActionListener{
                         case "Average Raw Score":
                             System.out.println("Using average raw score");
                             results.setScorer(new ScorerAvgRaw());
+                            break;
+                        case "Average Ordinal":
+                            results.setScorer(new ScorerAvgOrdinals());
                             break;
                         case "Relative Placement":
                         default:
@@ -133,6 +139,7 @@ public class ScorerGUI extends JFrame implements ActionListener{
 
         options.add(rbmiRelPlace);
         options.add(rbmiAvgRaw);
+        options.add(rbmiAvgOrd);
         options.addSeparator();
         options.add(rbmiComma);
         options.add(rbmiTilda);
@@ -223,6 +230,9 @@ public class ScorerGUI extends JFrame implements ActionListener{
                 break;
             case "Relative Placement":
                 currentScorer = "Relative Placement";
+                break;
+            case "Average Ordinal":
+                currentScorer = "Average Ordinal";
                 break;
             case "Average Raw Score":
                 currentScorer = "Average Raw Score";
